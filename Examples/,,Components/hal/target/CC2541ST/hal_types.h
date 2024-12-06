@@ -26,7 +26,7 @@
  its documentation for any purpose.
 
  YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
- PROVIDED “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ PROVIDED ï¿½AS ISï¿½ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
  NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
  TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
@@ -71,6 +71,10 @@ typedef unsigned char   bool;     //!< Boolean data type
 typedef uint8           halDataAlign_t; //!< Used for byte alignment
 /** @} End HAL_TYPES */
 
+typedef void (*ISR_FUNC_PTR)(void);
+typedef void (*VFPTR)(void);
+
+
 /* ------------------------------------------------------------------------------------------------
  *                               Memory Attributes and Compiler Macros
  * ------------------------------------------------------------------------------------------------
@@ -83,6 +87,16 @@ typedef uint8           halDataAlign_t; //!< Used for byte alignment
 #define DATA      __data
 #define NEAR_FUNC __near_func
 #define ASM_NOP    asm("NOP")
+// #define NOP()      asm("NOP")
+
+// #define HAL_MCU_LITTLE_ENDIAN()   __LITTLE_ENDIAN__
+// #define HAL_ISR_FUNC_DECLARATION(f,v)   \
+//     _PRAGMA(vector=v) __near_func __interrupt void f(void)
+// #define HAL_ISR_FUNC_PROTOTYPE(f,v)     \
+//     _PRAGMA(vector=v) __near_func __interrupt void f(void)
+// #define HAL_ISR_FUNCTION(f,v)           \
+//     HAL_ISR_FUNC_PROTOTYPE(f,v); HAL_ISR_FUNC_DECLARATION(f,v)
+
 
 /* ----------- KEIL Compiler ----------- */
 #elif defined __KEIL__

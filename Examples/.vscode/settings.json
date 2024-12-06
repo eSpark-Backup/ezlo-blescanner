@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "hal_types.h": "c",
+        "iocc254x_bitdef.h": "c",
+        "osal_pwrmgr.h": "c",
+        "osal_memory.h": "c"
+    }
+}
