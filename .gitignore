@@ -4,3 +4,6 @@ Exe/
 Obj/
 List/
 settings/
+/Examples/UUID_Broadcaster/build
+/Examples/UUID_Broadcaster/.vscode
+/Examples/UUID_Broadcaster/.devcontainer
