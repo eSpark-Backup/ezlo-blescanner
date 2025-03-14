@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "hal_types.h": "c",
+        "iocc254x_bitdef.h": "c",
+        "defines.h": "c",
+        "iocc2541.h": "c",
+        "print.h": "c",
+        "uart.h": "c",
+        "i2c.h": "c"
+    }
+}
