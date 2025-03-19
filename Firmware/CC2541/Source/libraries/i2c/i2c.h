@@ -17,7 +17,7 @@
 #define READ_FROM_SLAVE 0x01
 #define WRITE_TO_SLAVE 0x00
 
-// Commands issued from master/slave
+// // Commands issued from master/slave
 // enum
 // {
 //     SLAVE_INIT = 0x01,

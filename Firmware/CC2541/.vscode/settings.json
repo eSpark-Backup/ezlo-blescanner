@@ -6,6 +6,9 @@
         "iocc2541.h": "c",
         "print.h": "c",
         "uart.h": "c",
-        "i2c.h": "c"
+        "i2c.h": "c",
+        "hal_i2c.h": "c",
+        "hal_board_cfg.h": "c",
+        "hal_defs.h": "c"
     }
 }

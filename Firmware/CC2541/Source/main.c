@@ -1,77 +1,180 @@
-// /***********************************************************************************
-//   Filename:     main.c
+/******************************************************************************
 
-//   Description:  This example uses a slave to receive data using I2C.
+ @file  simpleBLEObserver_Main.c
 
-//   Comments:     To execute this example, use the IAR project i2c_master_send
-//                 as the master. The slave's code must be executed before executing
-//                 the master's code, since the slave is clocked by the Master.
-//                 When a stop condition received, the LED1 will be set on the
-//                 SmartRF05EB and the buffer index will be reset.
+ @brief This file contains the main and callback functions for the
+        Simple BLE Observer sample application.
 
-//   Note:         On the SmartRF05EB, P0_6 and P0_7 is shared by the 
-//                 EM_JOY_LEVEL and EM_LCD_CS signals. These have to be disconnected 
-//                 by removing jumpers 7-8 and 3-4 on P10 I/O Connector. Thus the I2C 
-//                 and SRF05EB LCD can't be used simultaneously.
+ Group: WCS, BTS
+ Target Device: CC2540, CC2541
 
-//                 The I2C pins also have external pullups on the EM, at the as 
-//                 required by the I2C standard.
+ ******************************************************************************
+ 
+ Copyright (c) 2011-2021, Texas Instruments Incorporated
+ All rights reserved.
 
-// ***********************************************************************************/
+ IMPORTANT: Your use of this Software is limited to those specific rights
+ granted under the terms of a software license agreement between the user
+ who downloaded the software, his/her employer (which must be your employer)
+ and Texas Instruments Incorporated (the "License"). You may not use this
+ Software unless you agree to abide by the terms of the License. The License
+ limits your use, and you acknowledge, that the Software may not be modified,
+ copied or distributed unless embedded on a Texas Instruments microcontroller
+ or used solely and exclusively in conjunction with a Texas Instruments radio
+ frequency transceiver, which is integrated into your product. Other than for
+ the foregoing purpose, you may not use, reproduce, copy, prepare derivative
+ works of, modify, distribute, perform, display or sell this Software and/or
+ its documentation for any purpose.
 
-#include "defines.h"
-#include "print.h"
-#include "uart.h"
-#include "i2c.h"
+ YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
+ PROVIDED �AS IS� WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
+ NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
+ TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
+ NEGLIGENCE, STRICT LIABILITY, CONTRIBUTION, BREACH OF WARRANTY, OR OTHER
+ LEGAL EQUITABLE THEORY ANY DIRECT OR INDIRECT DAMAGES OR EXPENSES
+ INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE
+ OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF PROCUREMENT
+ OF SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
+ (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
 
+ Should you have any questions regarding your right to use this Software,
+ contact Texas Instruments Incorporated at www.TI.com.
 
-/***********************************************************************************
-* CONSTANTS
-*/
+ ******************************************************************************
+ Release Name: ble_sdk_1.5.2.0
+ Release Date: 2021-03-10 17:38:59
+ *****************************************************************************/
 
+/**************************************************************************************************
+ *                                           Includes
+ **************************************************************************************************/
+/* Hal Drivers */
+#include "hal_types.h"
+#include "hal_timer.h"
+#include "hal_drivers.h"
+#include "hal_led.h"
 
-/***********************************************************************************
-* LOCAL VARIABLES
-*/
+/* OSAL */
+#include "OSAL.h"
+#include "OSAL_Tasks.h"
+#include "OSAL_PwrMgr.h"
+#include "osal_snv.h"
+#include "OnBoard.h"
 
+/**************************************************************************************************
+ * FUNCTIONS
+ **************************************************************************************************/
 
-/***********************************************************************************
-* @fn          main
-*
-* @brief       Send/receive data on UART0, using polling.
-*
-* @param       void
-*
-* @return      void
-*/
-void main (void)
+/**************************************************************************************************
+ * @fn          main
+ *
+ * @brief       Start of application.
+ *
+ * @param       none
+ *
+ * @return      none
+ **************************************************************************************************
+ */
+int main(void)
 {
-    /****************************************************************************
-    * Clock setup
-    * See basic software example "clk_xosc_cc254x"
-    */
-  
-    // Set system clock source to HS XOSC, with no pre-scaling.
-    CLKCONCMD = (CLKCONCMD & ~(CLKCON_OSC | CLKCON_CLKSPD)) | CLKCON_CLKSPD_32M;
-    // Wait until clock source has changed.
-    while (CLKCONSTA & CLKCON_OSC);
-  
-    /* Note the 32 kHz RCOSC starts calibrating, if not disabled. */
+  /* Initialize hardware */
+  HAL_BOARD_INIT();
 
+  // Initialize board I/O
+  // InitBoard( OB_COLD );
+
+  /* Initialze the HAL driver */
+  HalDriverInit();
+
+  /* Initialize NV system */
+  osal_snv_init();
+  
+  /* Initialize LL */
+
+  /* Initialize the operating system */
+  osal_init_system();
+
+  /* Enable interrupts */
+  HAL_ENABLE_INTERRUPTS();
+
+  // Final board initialization
+  // InitBoard( OB_READY );
+
+  #if defined ( POWER_SAVING )
+    osal_pwrmgr_device( PWRMGR_BATTERY );
+  #endif
     
-    uart_init();
-    i2c_init();
+  /* Start OSAL */
+  osal_start_system(); // No Return from here
 
-    while(1)
-    {
-
-        for(int i = 0; i<9000; i++)
-        {
-          for(int y = 0; y<90; y++)
-          {}
-        }
-        Printf(UART_TEST_DATA);
-    }
+  return 0;
 }
 
+/**************************************************************************************************
+                                           CALL-BACKS
+**************************************************************************************************/
+
+
+/*************************************************************************************************
+**************************************************************************************************/
+
+
+
+// // ***********************************************************************************/
+
+// #include "defines.h"
+// #include "print.h"
+// #include "uart.h"
+// #include "i2c.h"
+
+
+// /***********************************************************************************
+// * CONSTANTS
+// */
+
+
+// /***********************************************************************************
+// * LOCAL VARIABLES
+// */
+
+
+// /***********************************************************************************
+// * @fn          main
+// *
+// * @brief       Send/receive data on UART0, using polling.
+// *
+// * @param       void
+// *
+// * @return      void
+// */
+// void main (void)
+// {
+//     /****************************************************************************
+//     * Clock setup
+//     * See basic software example "clk_xosc_cc254x"
+//     */
+  
+//     // Set system clock source to HS XOSC, with no pre-scaling.
+//     CLKCONCMD = (CLKCONCMD & ~(CLKCON_OSC | CLKCON_CLKSPD)) | CLKCON_CLKSPD_32M;
+//     // Wait until clock source has changed.
+//     while (CLKCONSTA & CLKCON_OSC);
+  
+//     /* Note the 32 kHz RCOSC starts calibrating, if not disabled. */
+
+    
+//     uart_init();
+//     i2c_init();
+
+//     while(1)
+//     {
+
+//         for(int i = 0; i<9000; i++)
+//         {
+//           for(int y = 0; y<90; y++)
+//           {}
+//         }
+//         Printf(UART_TEST_DATA);
+//     }
+// }
 

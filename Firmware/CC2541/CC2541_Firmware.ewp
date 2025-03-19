@@ -64,11 +64,11 @@
                 <option>
                     <name>Workseg Size</name>
                     <version>0</version>
-                    <state>0</state>
+                    <state>8</state>
                 </option>
                 <option>
                     <name>Constant Placement</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>Datapointer Size</name>
@@ -142,20 +142,20 @@
                 <option>
                     <name>Input variant</name>
                     <version>2</version>
-                    <state>0</state>
+                    <state>5</state>
                 </option>
                 <option>
                     <name>Input description</name>
-                    <state>Automatic choice of formatter.</state>
+                    <state>No float.</state>
                 </option>
                 <option>
                     <name>Output variant</name>
                     <version>2</version>
-                    <state>0</state>
+                    <state>6</state>
                 </option>
                 <option>
                     <name>Output description</name>
-                    <state>Automatic choice of formatter.</state>
+                    <state>No float, no field width, no precision.</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -167,15 +167,15 @@
                 </option>
                 <option>
                     <name>General Idata Stack Size</name>
-                    <state>0x40</state>
+                    <state>0xC0</state>
                 </option>
                 <option>
                     <name>General Pdata Stack Size</name>
-                    <state>0x80</state>
+                    <state>0x00</state>
                 </option>
                 <option>
                     <name>General Xdata Stack Size</name>
-                    <state>0xEFF</state>
+                    <state>0x280</state>
                 </option>
                 <option>
                     <name>General Ext Stack Size</name>
@@ -306,6 +306,15 @@
                 <option>
                     <name>CCDefines</name>
                     <state>chip=2541</state>
+                    <state>INT_HEAP_LEN=2048</state>
+                    <state>HALNODEBUG</state>
+                    <state>OSAL_CBTIMER_NUM_TASKS=1</state>
+                    <state>HAL_AES_DMA=TRUE</state>
+                    <state>HAL_DMA=TRUE</state>
+                    <state>HAL_LCD=FALSE</state>
+                    <state>HAL_LED=FALSE</state>
+                    <state>HAL_KEY=FALSE</state>
+                    <state>HAL_I2C=TRUE</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -457,20 +466,33 @@
                 </option>
                 <option>
                     <name>Compiler Extra Options Check</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>Compiler Extra Options Edit</name>
-                    <state></state>
+                    <state>-f $PROJ_DIR$\Source\config\buildComponents.cfg</state>
+                    <state>-f $PROJ_DIR$\Source\config\buildConfig.cfg</state>
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\source</state>
-                    <state>$PROJ_DIR$\source\components</state>
-                    <state>$PROJ_DIR$\source\libraries\uart</state>
-                    <state>$PROJ_DIR$\source\libraries\i2c</state>
-                    <state>D:\.ide\IAR_Systems\8051\8051\inc</state>
-                    <state>D:\.ide\IAR_Systems\8051\8051\inc\dlib</state>
+                    <state>$PROJ_DIR$\source\common\cc2540</state>
+                    <state>$PROJ_DIR$\source\common\npi\npi_np</state>
+                    <state>$PROJ_DIR$\Source\components\ble\controller\CC254x\include</state>
+                    <state>$PROJ_DIR$\Source\components\ble\hci</state>
+                    <state>$PROJ_DIR$\Source\components\ble\host</state>
+                    <state>$PROJ_DIR$\Source\components\ble\include</state>
+                    <state>$PROJ_DIR$\Source\components\ble\controller\CC254x\include</state>
+                    <state>$PROJ_DIR$\Source\components\ble\controller\CC254x\phy</state>
+                    <state>$PROJ_DIR$\Source\components\hal\include</state>
+                    <state>$PROJ_DIR$\Source\components\hal\target\CC2541</state>
+                    <state>$PROJ_DIR$\Source\components\osal\include</state>
+                    <state>$PROJ_DIR$\Source\components\services\saddr</state>
+                    <state>$PROJ_DIR$\Source\libraries\Profiles\Include</state>
+                    <state>$PROJ_DIR$\Source\libraries\Profiles\Roles\CC254x</state>
+                    <state>$PROJ_DIR$\Source\libraries\Profiles\Roles</state>
+                    <state>$PROJ_DIR$\Source\libraries\Profiles\SimpleProfile</state>
+                    <state>$PROJ_DIR$\Source\libraries\Profiles\SimpleProfile\CC254x</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -495,16 +517,16 @@
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>1</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
                     <version>0</version>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>1</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>CompilerMisraRules04</name>
@@ -550,12 +572,12 @@
                 <option>
                     <name>CCAllowList2</name>
                     <version>0</version>
-                    <state>0000000</state>
+                    <state>1111110</state>
                 </option>
                 <option>
                     <name>CCOptStrategySlave</name>
                     <version>0</version>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
             </data>
         </settings>
@@ -709,7 +731,7 @@
                 </option>
                 <option>
                     <name>Include directories</name>
-                    <state></state>
+                    <state>$TOOLKIT_DIR$\SRC\LIB</state>
                 </option>
             </data>
         </settings>
@@ -818,11 +840,11 @@
                 </option>
                 <option>
                     <name>XclOverride</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>XclFile</name>
-                    <state>$TOOLKIT_DIR$\config\devices\Texas Instruments\lnk51ew_CC2541F256_banked.xcl</state>
+                    <state>D:\.Embedded\.GITHUB\ezlo-blescanner\Firmware\CC2541\Source\common\cc2540\ti_51ew_cc2540b.xcl</state>
                 </option>
                 <option>
                     <name>XclFileSlave</name>
@@ -2229,33 +2251,237 @@
         </settings>
     </configuration>
     <group>
-        <name>Components</name>
+        <name>app</name>
         <file>
-            <name>$PROJ_DIR$\Source\components\hal_types.h</name>
+            <name>$PROJ_DIR$\Source\main.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\Source\components\ioCC254x_bitdef.h</name>
+            <name>$PROJ_DIR$\Source\OSAL_SimpleBLEObserver.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\Source\simpleBLEObserver.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\Source\simpleBLEObserver.h</name>
         </file>
     </group>
     <group>
-        <name>Libraries</name>
+        <name>components</name>
         <group>
-            <name>i2c</name>
-            <file>
-                <name>$PROJ_DIR$\Source\libraries\i2c\i2c.c</name>
-            </file>
+            <name>ble</name>
+            <group>
+                <name>profiles</name>
+                <file>
+                    <name>$PROJ_DIR$\Source\libraries\Profiles\Roles\gap.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\libraries\Profiles\GATT\gattservapp_util.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\libraries\Profiles\Roles\CC254x\observer.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\libraries\Profiles\Roles\CC254x\observer.h</name>
+                </file>
+            </group>
         </group>
         <group>
-            <name>uart</name>
-            <file>
-                <name>$PROJ_DIR$\Source\libraries\uart\print.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\Source\libraries\uart\uart.c</name>
-            </file>
+            <name>hal</name>
+            <group>
+                <name>common</name>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\common\hal_drivers.c</name>
+                </file>
+            </group>
+            <group>
+                <name>includes</name>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_adc.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_assert.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_board.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_defs.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_drivers.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_flash.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_key.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_lcd.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_led.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_rpc.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_sleep.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_timer.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\hal_uart.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\hal\include\ioCC254x_bitdef.h</name>
+                </file>
+            </group>
+            <group>
+                <name>target</name>
+                <group>
+                    <name>config</name>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_board_cfg.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>drivers</name>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_aes.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_assert.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_crc.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_dma.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_flash.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_i2c.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_interrupt.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_keys.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_led.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_sleep.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_uart.c</name>
+                    </file>
+                </group>
+                <group>
+                    <name>includes</name>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_aes.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_crc.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_dma.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_drivers.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_i2c.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_keys.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_mcu.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\hal_types.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\components\hal\target\CC2541\stdint.h</name>
+                    </file>
+                </group>
+            </group>
+        </group>
+        <group>
+            <name>osal</name>
+            <group>
+                <name>common</name>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\osal\include\comdef.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\osal\common\OSAL.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\osal\common\osal_bufmgr.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\osal\common\osal_cbtimer.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\osal\common\OSAL_ClockBLE.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\osal\common\OSAL_Memory.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\osal\common\OSAL_PwrMgr.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\osal\common\OSAL_Timers.c</name>
+                </file>
+            </group>
+            <group>
+                <name>mcu</name>
+                <file>
+                    <name>$PROJ_DIR$\Source\components\osal\mcu\cc2540\osal_snv.c</name>
+                </file>
+            </group>
         </group>
     </group>
-    <file>
-        <name>$PROJ_DIR$\Source\main.c</name>
-    </file>
+    <group>
+        <name>LIB</name>
+        <file>
+            <name>$PROJ_DIR$\Source\libraries\CC2541DB\bin\CC2541_BLE_observ.lib</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\Source\libraries\Common\bin\CC254x_BLE_HCI_TL_None.lib</name>
+        </file>
+    </group>
+    <group>
+        <name>NPI</name>
+        <file>
+            <name>$PROJ_DIR$\Source\common\npi\npi_np\npi.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\Source\common\npi\npi_np\npi.h</name>
+        </file>
+    </group>
+    <group>
+        <name>tools</name>
+        <file>
+            <name>$PROJ_DIR$\Source\config\buildComponents.cfg</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\Source\config\buildConfig.cfg</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\Source\common\cc2540\OnBoard.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\Source\common\cc2540\OnBoard.h</name>
+        </file>
+    </group>
 </project>

@@ -44,8 +44,11 @@
 */
 
 // Buffer for UART RX/TX.
-static uint8 __xdata uartRxBuffer[SIZE_OF_UART_RX_BUFFER];
-static uint8 __xdata uartTxBuffer[SIZE_OF_UART_TX_BUFFER];// = UART_TEST_DATA;
+// extern uint8 __xdata uartRxBuffer[SIZE_OF_UART_RX_BUFFER];
+extern uint8 __xdata uartTxBuffer[SIZE_OF_UART_TX_BUFFER];// = UART_TEST_DATA;
+// extern uint16 __xdata uartRxIndex;
+extern uint16 __xdata uartTxIndex;
+extern uint8 __xdata transmitLength;
 
 
 /***********************************************************************************
@@ -55,6 +58,8 @@ static uint8 __xdata uartTxBuffer[SIZE_OF_UART_TX_BUFFER];// = UART_TEST_DATA;
 void uart_init();
 void uart0Send(uint8* uartTxBuf, uint16 uartTxBufLength);
 void uart0Receive(uint8* uartRxBuf, uint16 uartRxBufLength);
+void uart0StartTxForIsr(void);
+
 
 
 #endif   // UART_H

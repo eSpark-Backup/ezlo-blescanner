@@ -1,5 +1,12 @@
 #include "uart.h"
 
+// uint8 __xdata uartRxBuffer[SIZE_OF_UART_RX_BUFFER];
+uint8 __xdata uartTxBuffer[SIZE_OF_UART_TX_BUFFER];// = UART_TEST_DATA;
+// uint16 __xdata uartRxIndex;
+uint16 __xdata uartTxIndex;
+uint8 __xdata transmitLength = 0;
+
+
 /***********************************************************************************
 * @fn          uart_init
 *
@@ -81,7 +88,6 @@ void uart_init()
     U0GCR &= ~U0GCR_ORDER;
 }
 
-
 /***********************************************************************************
 * @fn          uart0Send
 *
@@ -138,5 +144,61 @@ void uart0Receive(uint8* uartRxBuf, uint16 uartRxBufLength)
 
         // Read UART0 RX buffer.
         uartRxBuf[uartRxIndex] = U0DBUF;
+    }
+}
+
+/***********************************************************************************
+* @fn          uart0StartTxForIsr
+*
+* @brief       Function which starts/initiates the transmission of byte sequence
+*              on UART0.
+*
+* @param       void
+*
+* @return      void
+*/
+void uart0StartTxForIsr(void)
+{
+    // Initialize the UART TX buffer index.
+    uartTxIndex = 0;
+  
+    // Clear any pending UART TX Interrupt Flag (IRCON2.UTXxIF = 0, UxCSR.TX_BYTE = 0).
+    UTX0IF = 0;
+    U0CSR &= ~U0CSR_TX_BYTE;
+  
+    // Enable global interrupt (IEN0.EA = 1) and UART TX Interrupt (IEN2.UTXxIE = 1).
+    IEN2 |= IEN2_UTX0IE;
+    EA = 1;
+  
+    // Trigger TX interrupt to start transmitting.
+    UTX0IF = 1;
+}
+
+/***********************************************************************************
+* @fn          UART0_TX_ISR
+*
+* @brief       Function which completes the UART transmit session, that is it
+*              sends the rest of the UART0 packet.
+*
+* @param       void
+*
+*/
+#pragma vector = UTX0_VECTOR
+__interrupt void UART0_TX_ISR(void)
+{
+    // Clear UART0 TX Interrupt Flag (IRCON2.UTX0IF = 0).
+    UTX0IF = 0;
+
+    // Send next UART byte.
+    U0DBUF = uartTxBuffer[uartTxIndex++];
+
+    // If no UART byte left to transmit, stop this UART TX session
+    if ((uartTxIndex >= transmitLength))
+    {
+        // Note:
+        // In order to start another UART TX session the application just needs
+        // to prepare the source buffer, and trigger the TX isr.
+        uartTxIndex = 0;
+        IEN2 &= ~IEN2_UTX0IE;
     }
 }
