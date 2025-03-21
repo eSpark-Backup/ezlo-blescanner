@@ -26,7 +26,7 @@
  its documentation for any purpose.
 
  YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
- PROVIDED ï¿½AS ISï¿½ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ PROVIDED “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
  NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
  TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
@@ -67,9 +67,6 @@
 #include "hal_timer.h"
 #include "hal_types.h"
 #include "hal_uart.h"
-#if ((defined HAL_I2C) && (HAL_I2C == TRUE))
-  #include "hal_i2c.h"
-#endif
 #ifdef CC2591_COMPRESSION_WORKAROUND
 #include "mac_rx.h"
 #endif
@@ -154,11 +151,6 @@ void HalDriverInit (void)
   /* UART */
 #if (defined HAL_UART) && (HAL_UART == TRUE)
   HalUARTInit();
-#endif
-
-  /* I2C */
-#if (defined HAL_I2C) && (HAL_I2C == TRUE)
-  HalI2CInit(0xFE, i2cClock_123KHZ);
 #endif
 
   /* KEY */

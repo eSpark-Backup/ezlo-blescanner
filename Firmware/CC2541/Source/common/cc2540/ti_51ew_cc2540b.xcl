@@ -24,7 +24,7 @@
   its documentation for any purpose.
 
   YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
-  PROVIDED ï¿½AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+  PROVIDED “AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
   INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
   NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
   TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
@@ -384,11 +384,3 @@
 -U(CODE)0x0000=(CODE)_FLASH_LOCK_BITS_START-_FLASH_LOCK_BITS_END
 //
 ////////////////////////////////////////////////////////////////////////////////
-
-
-//
-//  Device specific symbol definitions
-//  ==================================
--D?B=F0                       // B register location
--D?IE=A8                      // Interrupt Enable register location
--D?IP=A9                      // Interrupt Priority register location

@@ -9,6 +9,10 @@
         "i2c.h": "c",
         "hal_i2c.h": "c",
         "hal_board_cfg.h": "c",
-        "hal_defs.h": "c"
+        "hal_defs.h": "c",
+        "hal_uart.h": "c",
+        "hal_dma.h": "c",
+        "hal_drivers.h": "c",
+        "npi.h": "c"
     }
 }
