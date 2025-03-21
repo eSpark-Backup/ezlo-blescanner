@@ -413,6 +413,11 @@ st( \
 #define HAL_KEY TRUE
 #endif
 
+/* Set to TRUE enable I2C usage, FALSE disable it */
+#ifndef HAL_I2C
+#define HAL_I2C TRUE
+#endif
+
 /* Set to TRUE enable UART usage, FALSE disable it */
 #ifndef HAL_UART
 #if (defined ZAPP_P1) || (defined ZAPP_P2) || (defined ZTOOL_P1) || (defined ZTOOL_P2)

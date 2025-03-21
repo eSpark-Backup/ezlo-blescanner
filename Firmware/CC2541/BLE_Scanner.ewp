@@ -304,6 +304,7 @@
                     <state>HAL_LED=FALSE</state>
                     <state>HAL_KEY=FALSE</state>
                     <state>HAL_UART=TRUE</state>
+                    <state>HAL_I2C=TRUE</state>
                     <state>ZAPP_P1</state>
                 </option>
                 <option>
@@ -1232,6 +1233,9 @@
                     </file>
                     <file>
                         <name>$PROJ_DIR$\Source\Components\hal\target\CC2540EB\hal_flash.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\Source\Components\hal\target\CC2540EB\hal_i2c.c</name>
                     </file>
                     <file>
                         <name>$PROJ_DIR$\Source\Components\hal\target\CC2540EB\hal_key.c</name>

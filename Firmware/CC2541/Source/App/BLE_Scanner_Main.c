@@ -55,6 +55,7 @@
 #include "hal_timer.h"
 #include "hal_drivers.h"
 #include "hal_led.h"
+#include "hal_i2c.h"
 
 /* OSAL */
 #include "OSAL.h"
@@ -107,9 +108,13 @@ int main(void)
     osal_pwrmgr_device( PWRMGR_BATTERY );
   #endif
 
-  NPI_InitTransport(NULL);
-  Printf("This works?\n");
-  Printf("It does indeed.\n");
+  // NPI_InitTransport(NULL);
+  // Printf("This works?\n");
+  // Printf("It does indeed.\n");
+
+#if (defined HAL_I2C) && (HAL_I2C == TRUE)
+  HalI2CInit(HAL_I2C_SLAVE_ADDR_DEF, NULL);
+#endif
     
   /* Start OSAL */
   osal_start_system(); // No Return from here

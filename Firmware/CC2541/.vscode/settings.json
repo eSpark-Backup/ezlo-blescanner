@@ -13,6 +13,9 @@
         "hal_uart.h": "c",
         "hal_dma.h": "c",
         "hal_drivers.h": "c",
-        "npi.h": "c"
+        "npi.h": "c",
+        "hal_timer.h": "c",
+        "hal_key.h": "c",
+        "hal_led.h": "c"
     }
 }

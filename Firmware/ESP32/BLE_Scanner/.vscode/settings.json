@@ -1,0 +1,9 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.espIdfPathWin": "d:\\.toolchains\\esp\\v4.4.6\\idf\\v4.4.6\\esp-idf",
+    "idf.openOcdConfigs": [
+        "board/esp32-wrover-kit-3.3v.cfg"
+    ],
+    "idf.portWin": "COM20",
+    "idf.toolsPathWin": "d:\\.toolchains\\esp\\v4.4.6\\.espressif"
+}

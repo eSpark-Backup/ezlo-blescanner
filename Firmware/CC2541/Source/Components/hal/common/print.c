@@ -10,10 +10,16 @@ void Printf(const char *format, ...)
     va_list args;                    // Argument list for format specifiers
 
     va_start(args, format);          // Initialize the argument list
-    vsprintf((char*)txBuffer, format, args);  // Format the string
+    int transmitLength = vsprintf((char*)txBuffer, format, args);  // Format the string
     va_end(args);                    // Clean up the argument list
 
-    int transmitLength = strlen((char*)txBuffer);
+    // int transmitLength = strlen((char*)txBuffer);
+
+    if (transmitLength < NPI_UART_TX_BUF_SIZE - 1)
+    {
+        txBuffer[transmitLength] = '\n';
+        txBuffer[++transmitLength] = '\0';  // Null-terminate the string
+    }
     
     // HalUARTWrite(HAL_UART_PORT_0, txBuffer, transmitLength);
     NPI_WriteTransport(txBuffer, transmitLength);

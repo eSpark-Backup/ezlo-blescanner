@@ -7,3 +7,4 @@ settings/
 /Examples/UUID_Broadcaster/build
 /Examples/UUID_Broadcaster/.vscode
 /Examples/UUID_Broadcaster/.devcontainer
+/Firmware/ESP32/BLE_Scanner/build
