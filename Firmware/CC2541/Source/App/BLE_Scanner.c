@@ -170,21 +170,26 @@ void SimpleBLEObserver_Init( uint8 task_id )
 {
   simpleBLETaskId = task_id;
 
-  // Setup Observer Profile
-  {
-    uint8 scanRes = DEFAULT_MAX_SCAN_RES;
-    GAPObserverRole_SetParameter ( GAPOBSERVERROLE_MAX_SCAN_RES, sizeof( uint8 ), &scanRes );
-  }
+  // // Setup Observer Profile
+  // {
+  //   uint8 scanRes = DEFAULT_MAX_SCAN_RES;
+  //   GAPObserverRole_SetParameter ( GAPOBSERVERROLE_MAX_SCAN_RES, sizeof( uint8 ), &scanRes );
+  // }
   
-  // Setup GAP
-  GAP_SetParamValue( TGAP_GEN_DISC_SCAN, DEFAULT_SCAN_DURATION );
-  GAP_SetParamValue( TGAP_LIM_DISC_SCAN, DEFAULT_SCAN_DURATION );
+  // // Setup GAP
+  // GAP_SetParamValue( TGAP_GEN_DISC_SCAN, DEFAULT_SCAN_DURATION );
+  // GAP_SetParamValue( TGAP_LIM_DISC_SCAN, DEFAULT_SCAN_DURATION );
 
-  // Register for all key events - This app will handle all key events
-  RegisterForKeys( simpleBLETaskId );
+/* I2C */
+#if (defined HAL_I2C) && (HAL_I2C == TRUE)
+  HalI2CInit(HAL_I2C_SLAVE_ADDR_DEF, I2C_Callback_Func);
+#endif
+
+  // // Register for all key events - This app will handle all key events
+  // RegisterForKeys( simpleBLETaskId );
   
-  // makes sure LEDs are off
-  HalLedSet( (HAL_LED_1 | HAL_LED_2), HAL_LED_MODE_OFF );
+  // // // makes sure LEDs are off
+  // // HalLedSet( (HAL_LED_1 | HAL_LED_2), HAL_LED_MODE_OFF );
   
   // Setup a delayed profile startup
   osal_set_event( simpleBLETaskId, START_DEVICE_EVT );
@@ -221,7 +226,7 @@ uint16 SimpleBLEObserver_ProcessEvent( uint8 task_id, uint16 events )
     }
 
     // return unprocessed events
-    Printf("Processing SYS_EVENT_MSG.");
+    printf("Processing SYS_EVENT_MSG.\n");
     return (events ^ SYS_EVENT_MSG);
   }
 
@@ -230,7 +235,7 @@ uint16 SimpleBLEObserver_ProcessEvent( uint8 task_id, uint16 events )
     // Start the Device
     VOID GAPObserverRole_StartDevice( (gapObserverRoleCB_t *) &simpleBLERoleCB );
 
-    Printf("Processing START_DEVICE_EVT.");
+    printf("Processing START_DEVICE_EVT.\n");
     return ( events ^ START_DEVICE_EVT );
   }
 
@@ -448,6 +453,32 @@ char *bdAddr2Str( uint8 *pAddr )
   
   return str;
 }
+
+// #if (defined HAL_I2C) && (HAL_I2C == TRUE)
+// uint8 I2C_Callback_Func(uint8 cnt)
+// {
+//   printf("I2C cnt value is %x\n", cnt);
+
+//   uint8 buffer[HAL_I2C_BUF_MAX] = {0};
+
+//   HalI2CRead(cnt, buffer);
+//   for(int i = 0; i<cnt; i++)
+//   {
+//     printf("buffer[%d]: %x\n", i, buffer[i]);
+//   }
+
+//   if(buffer[0] == 0x75)
+//   {
+//     buffer[1] = 0x12;
+//     buffer[2] = 0x34;
+//     buffer[3] = 0x56;
+//     buffer[4] = 0x78;
+//     HalI2CWrite(4, &buffer[1]);
+//   }
+
+//   return 1;
+// }
+// #endif
 
 /*********************************************************************
 *********************************************************************/

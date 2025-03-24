@@ -368,12 +368,12 @@ st( \
 
 /* Set to TRUE enable H/W TIMER usage, FALSE disable it */
 #ifndef HAL_TIMER
-#define HAL_TIMER FALSE
+#define HAL_TIMER TRUE
 #endif
 
 /* Set to TRUE enable ADC usage, FALSE disable it */
 #ifndef HAL_ADC
-#define HAL_ADC TRUE
+#define HAL_ADC FALSE
 #endif
 
 /* Set to TRUE enable DMA usage, FALSE disable it */
@@ -397,12 +397,12 @@ st( \
 
 /* Set to TRUE enable LCD usage, FALSE disable it */
 #ifndef HAL_LCD
-#define HAL_LCD TRUE
+#define HAL_LCD FALSE
 #endif
 
 /* Set to TRUE enable LED usage, FALSE disable it */
 #ifndef HAL_LED
-#define HAL_LED TRUE
+#define HAL_LED FALSE
 #endif
 #if (!defined BLINK_LEDS) && (HAL_LED == TRUE)
 #define BLINK_LEDS
@@ -410,7 +410,7 @@ st( \
 
 /* Set to TRUE enable KEY usage, FALSE disable it */
 #ifndef HAL_KEY
-#define HAL_KEY TRUE
+#define HAL_KEY FALSE
 #endif
 
 /* Set to TRUE enable I2C usage, FALSE disable it */
@@ -429,20 +429,20 @@ st( \
 
 #if HAL_UART
 // Always prefer to use DMA over ISR.
-// #if HAL_DMA
-//   #ifndef HAL_UART_DMA
-//     #if (defined ZAPP_P1) || (defined ZTOOL_P1)
-//       #define HAL_UART_DMA  1
-//     #elif (defined ZAPP_P2) || (defined ZTOOL_P2)
-//       #define HAL_UART_DMA  2
-//     #else
-//       #define HAL_UART_DMA  1
-//     #endif
-//   #endif
-//   #ifndef HAL_UART_ISR
-//     #define HAL_UART_ISR  0
-//   #endif
-// #else
+#if HAL_DMA
+  #ifndef HAL_UART_DMA
+    #if (defined ZAPP_P1) || (defined ZTOOL_P1)
+      #define HAL_UART_DMA  1
+    #elif (defined ZAPP_P2) || (defined ZTOOL_P2)
+      #define HAL_UART_DMA  2
+    #else
+      #define HAL_UART_DMA  1
+    #endif
+  #endif
+  #ifndef HAL_UART_ISR
+    #define HAL_UART_ISR  0
+  #endif
+#else
   #ifndef HAL_UART_ISR
     #if (defined ZAPP_P1) || (defined ZTOOL_P1)
       #define HAL_UART_ISR  1
@@ -455,7 +455,7 @@ st( \
   #ifndef HAL_UART_DMA
     #define HAL_UART_DMA  0
   #endif
-// #endif
+#endif
 
 // Used to set P2 priority - USART0 over USART1 if both are defined.
 #if ((HAL_UART_DMA == 1) || (HAL_UART_ISR == 1))

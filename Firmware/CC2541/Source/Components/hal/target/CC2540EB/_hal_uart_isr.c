@@ -269,69 +269,19 @@ static void HalUARTResumeISR(void);
  *****************************************************************************/
 static void HalUARTInitISR(void)
 {
-//   // Set P2 priority - USART0 over USART1 if both are defined.
-//   P2DIR &= ~P2DIR_PRIPO;
-//   P2DIR |= HAL_UART_PRIPO;
+  // Set P2 priority - USART0 over USART1 if both are defined.
+  P2DIR &= ~P2DIR_PRIPO;
+  P2DIR |= HAL_UART_PRIPO;
 
-// #if (HAL_UART_ISR == 1)
-//   PERCFG &= ~HAL_UART_PERCFG_BIT;    // Set UART0 I/O location to P0.
-// #else
-//   PERCFG |= HAL_UART_PERCFG_BIT;     // Set UART1 I/O location to P1.
-// #endif
-//   PxSEL  |= HAL_UART_Px_RX_TX;       // Enable Tx and Rx on P1.
-//   ADCCFG &= ~HAL_UART_Px_RX_TX;      // Make sure ADC doesnt use this.
-//   UxCSR = CSR_MODE;                  // Mode is UART Mode.
-//   UxUCR = UCR_FLUSH;                 // Flush it.
-
-
-  // // Configure USART0 for Alternative 1 => Port P0 (PERCFG.U0CFG = 0).
-  PERCFG = (PERCFG & ~(0x03)) | (0x00);    
-          
-  // // Give priority to USART 0 over Timer 1 for port 0 pins.
-  P2DIR &= (0x00 << 6);
-
-  // // Set pins 2, 3 and 5 as peripheral I/O and pin 4 as GPIO output.
-  PxSEL |= (0x20) | (0x10) | (0x08) | (0x04);
-
-  // /***************************************************************************
-  // * Configure UART
-  // *
-  // */
-
-  // Initialise bitrate
-  UxBAUD = 216;
-  UxGCR = (UxGCR & ~(0x1F)) | 11;
-
-  // Initialise UART protocol (start/stop bit, data bits, parity, etc.):
-  // USART mode = UART (U0CSR.MODE = 1)
-  UxUCR |= 0x80;
-
-  // Start bit level = low => Idle level = high  (U0UCR.START = 0).
-  UxUCR &= ~0x01;
-
-  // Stop bit level = high (U0UCR.STOP = 1).
-  UxUCR |= 0x02;
-
-  // Number of stop bits = 1 (U0UCR.SPB = 0).
-  UxUCR &= ~0x04;
-
-  // Parity = disabled (U0UCR.PARITY = 0).
-  UxUCR &= ~0x08;
-
-  // 9-bit data enable = 8 bits transfer (U0UCR.BIT9 = 0).
-  UxUCR &= ~0x10;
-
-  // Level of bit 9 = 0 (U0UCR.D9 = 0), used when U0UCR.BIT9 = 1.
-  // Level of bit 9 = 1 (U0UCR.D9 = 1), used when U0UCR.BIT9 = 1.
-  // Parity = Even (U0UCR.D9 = 0), used when U0UCR.PARITY = 1.
-  // Parity = Odd (U0UCR.D9 = 1), used when U0UCR.PARITY = 1.
-  UxUCR &= ~0x20;
-
-  // Flow control = disabled (U0UCR.FLOW = 0).
-  UxUCR &= ~0x40;
-
-  // Bit order = LSB first (U0GCR.ORDER = 0).
-  UxGCR &= ~0x20;
+#if (HAL_UART_ISR == 1)
+  PERCFG &= ~HAL_UART_PERCFG_BIT;    // Set UART0 I/O location to P0.
+#else
+  PERCFG |= HAL_UART_PERCFG_BIT;     // Set UART1 I/O location to P1.
+#endif
+  PxSEL  |= HAL_UART_Px_RX_TX | HAL_UART_Px_CTS;       // Enable Tx and Rx on P1.
+  ADCCFG &= ~(HAL_UART_Px_RX_TX | HAL_UART_Px_CTS);      // Make sure ADC doesnt use this.
+  UxCSR = CSR_MODE;                  // Mode is UART Mode.
+  UxUCR = UCR_FLUSH;                 // Flush it.
 }
 
 /******************************************************************************

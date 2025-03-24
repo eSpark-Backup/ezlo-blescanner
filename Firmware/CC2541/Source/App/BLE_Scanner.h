@@ -27,7 +27,7 @@
  its documentation for any purpose.
 
  YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
- PROVIDED “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ PROVIDED ï¿½AS ISï¿½ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
  NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
  TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
@@ -57,6 +57,10 @@ extern "C"
 /*********************************************************************
  * INCLUDES
  */
+
+#if (defined HAL_I2C) && (HAL_I2C == TRUE)
+#include "hal_i2c.h"
+#endif
 
 /*********************************************************************
  * CONSTANTS
@@ -95,6 +99,11 @@ extern void SimpleBLEObserver_Init( uint8 task_id );
  * Task Event Processor for the BLE Application
  */
 extern uint16 SimpleBLEObserver_ProcessEvent( uint8 task_id, uint16 events );
+
+
+#if (defined HAL_I2C) && (HAL_I2C == TRUE)
+extern uint8 I2C_Callback_Func(uint8 cnt);
+#endif
 
 /*********************************************************************
 *********************************************************************/

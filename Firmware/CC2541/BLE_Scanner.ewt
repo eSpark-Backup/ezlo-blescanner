@@ -1097,6 +1097,9 @@
         <group>
             <name>Common</name>
             <file>
+                <name>$PROJ_DIR$\Source\Components\hal\common\hal_assert.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\Source\Components\hal\common\hal_drivers.c</name>
             </file>
             <file>

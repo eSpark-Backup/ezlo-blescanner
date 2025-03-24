@@ -80,6 +80,9 @@
 #if (defined HAL_SPI) && (HAL_SPI == TRUE)
 #include "hal_spi.h"
 #endif
+#if (defined HAL_I2C) && (HAL_I2C == TRUE)
+#include "hal_i2c.h"
+#endif
 
 #include "npi.h"
 
@@ -158,7 +161,7 @@ void HalDriverInit (void)
 
 //   /* I2C */
 // #if (defined HAL_I2C) && (HAL_I2C == TRUE)
-//   HalI2CInit();
+//   HalI2CInit(HAL_I2C_SLAVE_ADDR_DEF, NULL);
 // #endif
 
   /* KEY */

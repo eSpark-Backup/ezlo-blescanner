@@ -64,10 +64,15 @@
 #include "osal_snv.h"
 #include "OnBoard.h"
 #include "print.h"
+#include <stdio.h>
 
 /**************************************************************************************************
  * FUNCTIONS
  **************************************************************************************************/
+
+#if (defined HAL_I2C) && (HAL_I2C == TRUE)
+uint8 I2C_Callback_Func(uint8 cnt);
+#endif
 
 /**************************************************************************************************
  * @fn          main
@@ -93,7 +98,7 @@ int main(void)
   /* Initialize NV system */
   osal_snv_init();
   
-  /* Initialize LL */
+  // /* Initialize LL */
 
   /* Initialize the operating system */
   osal_init_system();
@@ -108,13 +113,13 @@ int main(void)
     osal_pwrmgr_device( PWRMGR_BATTERY );
   #endif
 
-  // NPI_InitTransport(NULL);
-  // Printf("This works?\n");
-  // Printf("It does indeed.\n");
+  int i = 0;
+  printf("This works?\n");
+  printf("It does indeed %d.\n", i++);
 
-#if (defined HAL_I2C) && (HAL_I2C == TRUE)
-  HalI2CInit(HAL_I2C_SLAVE_ADDR_DEF, NULL);
-#endif
+// #if (defined HAL_I2C) && (HAL_I2C == TRUE)
+//   HalI2CInit(HAL_I2C_SLAVE_ADDR_DEF, I2C_Callback_Func);
+// #endif
     
   /* Start OSAL */
   osal_start_system(); // No Return from here
@@ -126,6 +131,31 @@ int main(void)
                                            CALL-BACKS
 **************************************************************************************************/
 
+#if (defined HAL_I2C) && (HAL_I2C == TRUE)
+uint8 I2C_Callback_Func(uint8 cnt)
+{
+  printf("I2C cnt value is %x\n", cnt);
+
+  uint8 buffer[HAL_I2C_BUF_MAX] = {0};
+
+  HalI2CRead(cnt, buffer);
+  for(int i = 0; i<cnt; i++)
+  {
+    printf("buffer[%d]: %x\n", i, buffer[i]);
+  }
+
+  if(buffer[0] == 0x75)
+  {
+    buffer[1] = 0x12;
+    buffer[2] = 0x34;
+    buffer[3] = 0x56;
+    buffer[4] = 0x78;
+    HalI2CWrite(2, &buffer[1]);
+  }
+
+  return 1;
+}
+#endif
 
 /*************************************************************************************************
 **************************************************************************************************/

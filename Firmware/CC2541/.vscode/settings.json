@@ -16,6 +16,7 @@
         "npi.h": "c",
         "hal_timer.h": "c",
         "hal_key.h": "c",
-        "hal_led.h": "c"
+        "hal_led.h": "c",
+        "cstdio": "c"
     }
 }

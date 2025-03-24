@@ -22,8 +22,8 @@
 
 static const char *TAG = "i2c-simple-example";
 
-#define I2C_MASTER_SCL_IO           CONFIG_I2C_MASTER_SCL      /*!< GPIO number used for I2C master clock */
-#define I2C_MASTER_SDA_IO           CONFIG_I2C_MASTER_SDA      /*!< GPIO number used for I2C master data  */
+#define I2C_MASTER_SCL_IO           22//CONFIG_I2C_MASTER_SCL      /*!< GPIO number used for I2C master clock */
+#define I2C_MASTER_SDA_IO           21//CONFIG_I2C_MASTER_SDA      /*!< GPIO number used for I2C master data  */
 #define I2C_MASTER_NUM              0                          /*!< I2C master i2c port number, the number of i2c peripheral interfaces available will depend on the chip */
 #define I2C_MASTER_FREQ_HZ          400000                     /*!< I2C master clock frequency */
 #define I2C_MASTER_TX_BUF_DISABLE   0                          /*!< I2C master doesn't need buffer */
@@ -41,7 +41,8 @@ static const char *TAG = "i2c-simple-example";
  */
 static esp_err_t CC2541_read(uint8_t reg_addr, uint8_t *data, size_t len)
 {
-    return i2c_master_write_read_device(I2C_MASTER_NUM, MPU9250_SENSOR_ADDR, &reg_addr, 1, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_RATE_MS);
+    return i2c_master_write_read_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, &reg_addr, 1, data, len, portMAX_DELAY);
+    // return i2c_master_write_read_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, &reg_addr, 1, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_RATE_MS);
 }
 
 // /**
@@ -85,9 +86,15 @@ void app_main(void)
     ESP_ERROR_CHECK(i2c_master_init());
     ESP_LOGI(TAG, "I2C initialized successfully");
 
-    /* Read the MPU9250 WHO_AM_I register, on power up the register should have the value 0x71 */
-    ESP_ERROR_CHECK(CC2541_read(CC2541_SENSOR_ADDR, data, 1));
-    ESP_LOGI(TAG, "WHO_AM_I = %X", data[0]);
+    do
+    {
+        /* Read the MPU9250 WHO_AM_I register, on power up the register should have the value 0x71 */
+        CC2541_read(CC2541_WHO_AM_I_REG_ADDR, data, 2);
+        // ESP_ERROR_CHECK(CC2541_read(CC2541_SENSOR_ADDR, data, 1));
+        ESP_LOGI(TAG, "WHO_AM_I = %X data[0]", data[0]);
+        ESP_LOGI(TAG, "WHO_AM_I = %X data[1]", data[1]);
+        vTaskDelay(1000 / portTICK_RATE_MS);
+    } while(1);
 
     /* Demonstrate writing by reseting the MPU9250 */
     // ESP_ERROR_CHECK(mpu9250_register_write_byte(MPU9250_PWR_MGMT_1_REG_ADDR, 1 << MPU9250_RESET_BIT));

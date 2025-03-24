@@ -218,7 +218,7 @@ static volatile i2cLen_t i2cRxLen, i2cTxLen;
  */
 static uint8 i2cMstStrt(uint8 address, uint8 RD_WRn)
 {
-  Printf("Attempt to send an I2C bus START and Slave Address as an I2C bus Master.\n");
+  printf("Attempt to send an I2C bus START and Slave Address as an I2C bus Master.\n");
   I2C_STRT();
 
   if (I2CSTAT == mstStarted)
@@ -247,7 +247,7 @@ static uint8 i2cMstStrt(uint8 address, uint8 RD_WRn)
  */
 void HalI2CInit(i2cClock_t clockRate)
 {
-  Printf("HalI2CInit with clock rate %d", clockRate);
+  printf("HalI2CInit with clock rate %d", clockRate);
   I2C_WRAPPER_DISABLE();
   I2CADDR = 0; // no multi master support at this time
   I2C_CLOCK_RATE(clockRate);
@@ -471,7 +471,7 @@ static i2cLen_t i2cSlvTx(void)
  */
 void HalI2CInit(uint8 address, i2cCallback_t i2cCallback)
 {
-  Printf("HalI2CInit, address: %x", address);
+  printf("HalI2CInit, address: %x", address);
   i2cCB = i2cCallback;
   HAL_ASSERT(i2cCB);
 
