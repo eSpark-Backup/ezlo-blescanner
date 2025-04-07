@@ -58,6 +58,7 @@
 #include "comdef.h"
 #include "hal_board_cfg.h"
 #if (defined HAL_I2C) && (HAL_I2C == TRUE)
+#include <string.h>
 
 /* ------------------------------------------------------------------------------------------------
  *                                          Constants
@@ -123,6 +124,8 @@ typedef enum {
  * @param       cnt - Zero indicates Master read request and slave Tx buffer empty. Non-zero
  *                    indicates the number of bytes received from a Master write,
  *                    this data is in the slave Rx buffer, ready to be read.
+ * 
+ *              src - callback source, use i2cStatus_t enum here
  *
  * output parameters
  *
@@ -131,7 +134,7 @@ typedef enum {
  * @return      N/A when cnt is non-zero; otherwise TRUE if I2C should continue to clock stretch,
  *              FALSE to send a zero with last byte indication.
  */
-typedef uint8 (*i2cCallback_t)(uint8 cnt);
+typedef uint8 (*i2cCallback_t)(uint8 cnt, uint8 src);
 #endif
 
 /* ------------------------------------------------------------------------------------------------

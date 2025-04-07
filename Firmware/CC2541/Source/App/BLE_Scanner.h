@@ -66,10 +66,28 @@ extern "C"
  * CONSTANTS
  */
 
-
+// 15 events can be registerred, SYS_EVENT_MSG(0x8000) is already used
 // Simple BLE Observer Task Events
 #define START_DEVICE_EVT                              0x0001
 #define START_DISCOVERY_EVT                           0x0002
+#define WHO_AM_I_EVT                                  0x0004
+#define RESET_EVT                                     0x0008
+ 
+#define BLE_REPORT_EVT                                0x0010
+#define BLE_SCAN_START_EVT                            0x0020
+#define BLE_SCAN_STOP_EVT                             0x0040
+
+#define I2C_DEBUG_PRINT_1                             0x1000
+#define I2C_DEBUG_PRINT_2                             0x2000
+
+#define START_SCAN                                      0x01
+#define STOP_SCAN                                       0x08
+
+// I2C registers/commands
+#define WHO_AM_I                                        0xEE
+#define DEV_RESET                                       0x50
+#define BLE_SCAN                                        0x12
+#define BLE_PRNT                                        0x22
 
 /*********************************************************************
  * MACROS
@@ -84,6 +102,13 @@ extern "C"
 #define LCD_WRITE_STRING(str, option)                     
 #define LCD_WRITE_SCREEN(line1, line2)                    
 #define LCD_WRITE_STRING_VALUE(title, value, format, line)
+#endif
+
+
+#if ( DEBUG_MSGS ) && ( DEBUG_MSGS == TRUE)
+#define LOG(...)       printf(__VA_ARGS__)
+#else
+#define LOG(...)
 #endif
 
 /*********************************************************************
@@ -102,7 +127,7 @@ extern uint16 SimpleBLEObserver_ProcessEvent( uint8 task_id, uint16 events );
 
 
 #if (defined HAL_I2C) && (HAL_I2C == TRUE)
-extern uint8 I2C_Callback_Func(uint8 cnt);
+extern uint8 I2C_Callback_Func(uint8 cnt, uint8 src);
 #endif
 
 /*********************************************************************

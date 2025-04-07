@@ -70,9 +70,9 @@
  * FUNCTIONS
  **************************************************************************************************/
 
-#if (defined HAL_I2C) && (HAL_I2C == TRUE)
-uint8 I2C_Callback_Func(uint8 cnt);
-#endif
+// #if (defined HAL_I2C) && (HAL_I2C == TRUE)
+// uint8 I2C_Callback_Func(uint8 cnt);
+// #endif
 
 /**************************************************************************************************
  * @fn          main
@@ -113,13 +113,19 @@ int main(void)
     osal_pwrmgr_device( PWRMGR_BATTERY );
   #endif
 
-  int i = 0;
-  printf("This works?\n");
-  printf("It does indeed %d.\n", i++);
+  printf("CHIP ID: 0x%X\n", CHIPID);
+  printf("CHIP Version: %d\n", CHVER);
 
 // #if (defined HAL_I2C) && (HAL_I2C == TRUE)
 //   HalI2CInit(HAL_I2C_SLAVE_ADDR_DEF, I2C_Callback_Func);
 // #endif
+
+#if HAL_I2C_POLLED
+  while(1)
+  {
+    HalI2CPoll();
+  }
+#endif
     
   /* Start OSAL */
   osal_start_system(); // No Return from here
@@ -131,31 +137,36 @@ int main(void)
                                            CALL-BACKS
 **************************************************************************************************/
 
-#if (defined HAL_I2C) && (HAL_I2C == TRUE)
-uint8 I2C_Callback_Func(uint8 cnt)
-{
-  printf("I2C cnt value is %x\n", cnt);
+// #if (defined HAL_I2C) && (HAL_I2C == TRUE)
+// uint8 buffer[HAL_I2C_BUF_MAX] = {0};
+// uint8 I2C_Callback_Func(uint8 cnt)
+// {
+//   static uint8 indx = 0;
+//   printf("I2C cnt value is %x\n", cnt);
 
-  uint8 buffer[HAL_I2C_BUF_MAX] = {0};
+//   if(cnt!=0)
+//   {
+//     HalI2CRead(cnt, buffer);
+//     for(int i = 0; i<cnt; i++)
+//     {
+//       printf("buffer[%d]: %x\n", i, buffer[i]);
+//     }
+  
+//     if(buffer[0] == 0x75)
+//     {
+//       buffer[1] = 0x12;
+//       buffer[2] = 0x34;
+//       buffer[3] = 0x56;
+//       buffer[4] = 0x78;
+//       HalI2CWrite(1, &buffer[((indx++)%4)+1]);
+//       // i2cSlvTx();
+//       printf("Transmitting  %x\n", buffer[((indx)%4)+1]);
+//     }
+//   }
 
-  HalI2CRead(cnt, buffer);
-  for(int i = 0; i<cnt; i++)
-  {
-    printf("buffer[%d]: %x\n", i, buffer[i]);
-  }
-
-  if(buffer[0] == 0x75)
-  {
-    buffer[1] = 0x12;
-    buffer[2] = 0x34;
-    buffer[3] = 0x56;
-    buffer[4] = 0x78;
-    HalI2CWrite(2, &buffer[1]);
-  }
-
-  return 1;
-}
-#endif
+//   return 1;
+// }
+// #endif
 
 /*************************************************************************************************
 **************************************************************************************************/

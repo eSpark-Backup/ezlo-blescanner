@@ -31,32 +31,63 @@ static const char *TAG = "i2c-simple-example";
 #define I2C_MASTER_TIMEOUT_MS       1000
 
 #define CC2541_SENSOR_ADDR                 0x41        /*!< Slave address of the MPU9250 sensor */
-#define CC2541_WHO_AM_I_REG_ADDR           0x75        /*!< Register addresses of the "who am I" register */
+#define GENERAL_CALL_ADDR                  0x00        /*!< Slave address of the MPU9250 sensor */
+#define CC2541_WHO_AM_I_REG_ADDR           0xEE        /*!< Register addresses of the "who am I" register */
 
 // #define MPU9250_PWR_MGMT_1_REG_ADDR         0x6B        /*!< Register addresses of the power managment register */
 // #define MPU9250_RESET_BIT                   7
 
 /**
- * @brief Read a sequence of bytes from a MPU9250 sensor registers
+ * @brief General call to i2c bus
  */
-static esp_err_t CC2541_read(uint8_t reg_addr, uint8_t *data, size_t len)
+static esp_err_t General_i2c_read(uint8_t reg_addr, uint8_t *data, size_t len)
 {
-    return i2c_master_write_read_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, &reg_addr, 1, data, len, portMAX_DELAY);
+    i2c_master_write_to_device(I2C_MASTER_NUM, GENERAL_CALL_ADDR, &reg_addr, 1, I2C_MASTER_TIMEOUT_MS / portTICK_RATE_MS);
+    return i2c_master_read_from_device(I2C_MASTER_NUM, GENERAL_CALL_ADDR, data, len, portMAX_DELAY);
+
+    // return i2c_master_write_read_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, &reg_addr, 1, data, len, portMAX_DELAY);
     // return i2c_master_write_read_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, &reg_addr, 1, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_RATE_MS);
 }
 
-// /**
-//  * @brief Write a byte to a MPU9250 sensor register
-//  */
-// static esp_err_t mpu9250_register_write_byte(uint8_t reg_addr, uint8_t data)
-// {
-//     int ret;
-//     uint8_t write_buf[2] = {reg_addr, data};
+/**
+ * @brief Read a sequence of bytes from a CC2541 tranceiver
+ */
+static esp_err_t CC2541_read(uint8_t reg_addr, uint8_t *data, size_t len)
+{
+    // i2c_master_write_to_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, &reg_addr, 1, I2C_MASTER_TIMEOUT_MS / portTICK_RATE_MS);
+    // return i2c_master_read_from_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, data, len, portMAX_DELAY);
+    // uint8_t var1 = 0xEE;
+    uint8_t buff[3] = {0xFF, 0xFF, 0xFF};
+    // esp_err_t ret = i2c_master_write_read_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, &var1, 1, buff, 3, portMAX_DELAY);
+    i2c_master_write_to_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, &reg_addr, 1, I2C_MASTER_TIMEOUT_MS / portTICK_RATE_MS);
+    vTaskDelay(1 / portTICK_RATE_MS);
+    esp_err_t ret = i2c_master_read_from_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, buff, 3, I2C_MASTER_TIMEOUT_MS / portTICK_RATE_MS);
 
-//     ret = i2c_master_write_to_device(I2C_MASTER_NUM, MPU9250_SENSOR_ADDR, write_buf, sizeof(write_buf), I2C_MASTER_TIMEOUT_MS / portTICK_RATE_MS);
+    ESP_LOGI(TAG, "ret = %s", esp_err_to_name(ret));
 
-//     return ret;
-// }
+    ESP_LOGW(TAG, "buff[0] = %X", buff[0]);
+    ESP_LOGW(TAG, "buff[1] = %X", buff[1]);
+    ESP_LOGW(TAG, "buff[2] = %X", buff[2]);
+    return 0;
+    // return i2c_master_write_read_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, &reg_addr, 1, data, len, I2C_MASTER_TIMEOUT_MS / portTICK_RATE_MS);
+}
+
+/**
+ * @brief Write a byte to a MPU9250 sensor register
+ */
+static esp_err_t CC2541_write(uint8_t reg_addr, uint8_t data)
+{
+    int ret;
+    uint8_t write_buf[3] = {reg_addr, data, 0x12};
+
+    ESP_LOGW(TAG, "write_buf[] = {%X,%X,%X}", write_buf[0], write_buf[1], write_buf[2]);
+    ret = i2c_master_write_to_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, write_buf, sizeof(write_buf), portMAX_DELAY);
+    // ret = i2c_master_write_to_device(I2C_MASTER_NUM, CC2541_SENSOR_ADDR, write_buf, sizeof(write_buf), I2C_MASTER_TIMEOUT_MS / portTICK_RATE_MS);
+
+    ESP_LOGI(TAG, "ret = %s", esp_err_to_name(ret));
+
+    return ret;
+}
 
 /**
  * @brief i2c master initialization
@@ -82,19 +113,29 @@ static esp_err_t i2c_master_init(void)
 
 void app_main(void)
 {
-    uint8_t data[2];
+    uint8_t data[2] = {0xFF, 0xFF};
     ESP_ERROR_CHECK(i2c_master_init());
     ESP_LOGI(TAG, "I2C initialized successfully");
 
-    do
-    {
+    // do
+    // {
         /* Read the MPU9250 WHO_AM_I register, on power up the register should have the value 0x71 */
-        CC2541_read(CC2541_WHO_AM_I_REG_ADDR, data, 2);
-        // ESP_ERROR_CHECK(CC2541_read(CC2541_SENSOR_ADDR, data, 1));
+        CC2541_read(CC2541_WHO_AM_I_REG_ADDR, data, 1);
         ESP_LOGI(TAG, "WHO_AM_I = %X data[0]", data[0]);
-        ESP_LOGI(TAG, "WHO_AM_I = %X data[1]", data[1]);
+        //     // ESP_LOGI(TAG, "WHO_AM_I = %X data[1]", data[1]);
+        //     // data[0] = 0xFF;
+
+        // CC2541_write(CC2541_WHO_AM_I_REG_ADDR, 0x32);
+
+        // ESP_LOGI(TAG, "WHO_AM_I = %X data[0]", data[0]);
         vTaskDelay(1000 / portTICK_RATE_MS);
-    } while(1);
+        CC2541_write(0x12, 0xFF);
+        vTaskDelay(5000 / portTICK_RATE_MS);
+        CC2541_write(0x22, 0xFF);
+        vTaskDelay(1000 / portTICK_RATE_MS);
+        // CC2541_write(0x50, 0xFF);
+        // vTaskDelay(1000 / portTICK_RATE_MS);
+    // } while(1);
 
     /* Demonstrate writing by reseting the MPU9250 */
     // ESP_ERROR_CHECK(mpu9250_register_write_byte(MPU9250_PWR_MGMT_1_REG_ADDR, 1 << MPU9250_RESET_BIT));

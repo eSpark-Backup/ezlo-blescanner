@@ -305,6 +305,8 @@
                     <state>HAL_KEY=FALSE</state>
                     <state>HAL_UART=TRUE</state>
                     <state>ZAPP_P1</state>
+                    <state>HAL_I2C_POLLED=FALSE</state>
+                    <state>DEBUG_MSGS=TRUE</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>

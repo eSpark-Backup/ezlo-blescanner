@@ -132,7 +132,8 @@ static uint8 simpleBLEScanning = FALSE;
  * LOCAL FUNCTIONS
  */
 static uint8 simpleBLEObserverEventCB( gapObserverRoleEvent_t *pEvent );
-static void simpleBLEObserver_HandleKeys( uint8 shift, uint8 keys );
+static void simpleBLEObserver_HandleCommand( uint8 shift, uint8 cmd );
+// static void simpleBLEObserver_HandleKeys( uint8 shift, uint8 keys );
 static void simpleBLEObserver_ProcessOSALMsg( osal_event_hdr_t *pMsg );
 static void simpleBLEAddDeviceInfo( uint8 *pAddr, uint8 addrType );
 char *bdAddr2Str ( uint8 *pAddr );
@@ -168,28 +169,31 @@ static const gapObserverRoleCB_t simpleBLERoleCB =
  */
 void SimpleBLEObserver_Init( uint8 task_id )
 {
+  LOG("Initializing App.\n");
   simpleBLETaskId = task_id;
-
-  // // Setup Observer Profile
-  // {
-  //   uint8 scanRes = DEFAULT_MAX_SCAN_RES;
-  //   GAPObserverRole_SetParameter ( GAPOBSERVERROLE_MAX_SCAN_RES, sizeof( uint8 ), &scanRes );
-  // }
   
-  // // Setup GAP
-  // GAP_SetParamValue( TGAP_GEN_DISC_SCAN, DEFAULT_SCAN_DURATION );
-  // GAP_SetParamValue( TGAP_LIM_DISC_SCAN, DEFAULT_SCAN_DURATION );
-
 /* I2C */
 #if (defined HAL_I2C) && (HAL_I2C == TRUE)
+  LOG("Setting up i2c driver.\n");
   HalI2CInit(HAL_I2C_SLAVE_ADDR_DEF, I2C_Callback_Func);
 #endif
+  
+  LOG("Setting up BLE profile.\n");
+  // Setup Observer Profile
+  {
+    uint8 scanRes = DEFAULT_MAX_SCAN_RES;
+    GAPObserverRole_SetParameter ( GAPOBSERVERROLE_MAX_SCAN_RES, sizeof( uint8 ), &scanRes );
+  }
+  
+  // Setup GAP
+  GAP_SetParamValue( TGAP_GEN_DISC_SCAN, DEFAULT_SCAN_DURATION );
+  GAP_SetParamValue( TGAP_LIM_DISC_SCAN, DEFAULT_SCAN_DURATION );
 
   // // Register for all key events - This app will handle all key events
   // RegisterForKeys( simpleBLETaskId );
   
-  // // // makes sure LEDs are off
-  // // HalLedSet( (HAL_LED_1 | HAL_LED_2), HAL_LED_MODE_OFF );
+  // // makes sure LEDs are off
+  // HalLedSet( (HAL_LED_1 | HAL_LED_2), HAL_LED_MODE_OFF );
   
   // Setup a delayed profile startup
   osal_set_event( simpleBLETaskId, START_DEVICE_EVT );
@@ -210,11 +214,12 @@ void SimpleBLEObserver_Init( uint8 task_id )
  */
 uint16 SimpleBLEObserver_ProcessEvent( uint8 task_id, uint16 events )
 {
-  
   VOID task_id; // OSAL required parameter that isn't used in this function
+  LOG("executing SimpleBLEObserver_ProcessEvent\n");
   
   if ( events & SYS_EVENT_MSG )
   {
+    LOG("Processing SYS_EVENT_MSG.\n");
     uint8 *pMsg;
 
     if ( (pMsg = osal_msg_receive( simpleBLETaskId )) != NULL )
@@ -226,19 +231,77 @@ uint16 SimpleBLEObserver_ProcessEvent( uint8 task_id, uint16 events )
     }
 
     // return unprocessed events
-    printf("Processing SYS_EVENT_MSG.\n");
     return (events ^ SYS_EVENT_MSG);
   }
 
   if ( events & START_DEVICE_EVT )
   {
     // Start the Device
+    LOG("Processing START_DEVICE_EVT.\n");
+    // uint8 macAddr[6];
+    // osal_memcpy(macAddr, (uint8*)0x7800, 6);
+    // LOG("macAddr[]: ");
+    // for(uint8 i=0; i<6; i++)
+    // {
+    //   LOG("%X ", macAddr[i]);
+    // }
+    // LOG("\n");
+
     VOID GAPObserverRole_StartDevice( (gapObserverRoleCB_t *) &simpleBLERoleCB );
 
-    printf("Processing START_DEVICE_EVT.\n");
+    // if ( !simpleBLEScanning )
+    // {
+    //   simpleBLEScanning = TRUE;
+    //   simpleBLEScanRes = 0;
+
+    //   // strcpy(buffer, "Discovering...\n");
+    //   // uart0Send((uint8*)buffer, osal_strlen(buffer));
+      
+    //   GAPObserverRole_StartDiscovery( DEFAULT_DISCOVERY_MODE,
+    //                                   DEFAULT_DISCOVERY_ACTIVE_SCAN,
+    //                                   DEFAULT_DISCOVERY_WHITE_LIST );      
+    // }
+
     return ( events ^ START_DEVICE_EVT );
   }
 
+  if ( events & BLE_SCAN_START_EVT )
+  {
+    LOG("BLE_SCAN_START_EVT: \n");
+
+    simpleBLEObserver_HandleCommand(0, START_SCAN);
+    
+    return ( events ^ BLE_SCAN_START_EVT );
+  }
+
+  if ( events & BLE_SCAN_STOP_EVT )
+  {
+    LOG("BLE_SCAN_STOP_EVT: \n");
+
+    simpleBLEObserver_HandleCommand(0, STOP_SCAN);
+
+    return ( events ^ BLE_SCAN_STOP_EVT );
+  }
+
+  if ( events & WHO_AM_I_EVT )
+  {
+    LOG("WHO_AM_I_EVT:  sending CHIPID:0x%X and CHVER:%d.\n", CHIPID, CHVER);
+
+    uint8 var[] = {CHIPID, CHVER};
+    HalI2CWrite(2, var);
+    
+    return ( events ^ WHO_AM_I_EVT );
+  }
+
+  if ( events & RESET_EVT )
+  {
+    LOG("RESET_EVT:\n");
+    while(HalUARTBusy(NPI_UART_PORT));
+
+    Onboard_soft_reset();
+    
+    return ( events ^ RESET_EVT );
+  }
   
   // Discard unknown events
   return 0;
@@ -258,7 +321,7 @@ static void simpleBLEObserver_ProcessOSALMsg( osal_event_hdr_t *pMsg )
   switch ( pMsg->event )
   {
     case KEY_CHANGE:
-      simpleBLEObserver_HandleKeys( ((keyChange_t *)pMsg)->state, ((keyChange_t *)pMsg)->keys );
+      // simpleBLEObserver_HandleKeys( ((keyChange_t *)pMsg)->state, ((keyChange_t *)pMsg)->keys );
       break;
       
     default:
@@ -279,11 +342,12 @@ static void simpleBLEObserver_ProcessOSALMsg( osal_event_hdr_t *pMsg )
  * @return  none
  */
 uint8 gStatus;
-static void simpleBLEObserver_HandleKeys( uint8 shift, uint8 keys )
+static void simpleBLEObserver_HandleCommand( uint8 shift, uint8 cmd )
+// static void simpleBLEObserver_HandleKeys( uint8 shift, uint8 keys )
 {
   (void)shift;  // Intentionally unreferenced parameter
 
-  if ( keys & HAL_KEY_UP )
+  if ( cmd & START_SCAN )
   {
     // Start or stop discovery
     if ( !simpleBLEScanning )
@@ -291,8 +355,10 @@ static void simpleBLEObserver_HandleKeys( uint8 shift, uint8 keys )
       simpleBLEScanning = TRUE;
       simpleBLEScanRes = 0;
       
-      LCD_WRITE_STRING( "Discovering...", HAL_LCD_LINE_1 );
-      LCD_WRITE_STRING( "", HAL_LCD_LINE_2 );
+      LOG( "Discovering..." );
+      LOG( "\n" );
+      // LCD_WRITE_STRING( "Discovering...", HAL_LCD_LINE_1 );
+      // LCD_WRITE_STRING( "", HAL_LCD_LINE_2 );
       
       GAPObserverRole_StartDiscovery( DEFAULT_DISCOVERY_MODE,
                                       DEFAULT_DISCOVERY_ACTIVE_SCAN,
@@ -304,11 +370,12 @@ static void simpleBLEObserver_HandleKeys( uint8 shift, uint8 keys )
     }
   }
 
-  if ( keys & HAL_KEY_LEFT )
+  if ( cmd & STOP_SCAN )
   {
     // Display discovery results
     if ( !simpleBLEScanning && simpleBLEScanRes > 0 )
     {
+      printf("cmd & STOP_SCAN");
         // Increment index of current result (with wraparound)
         simpleBLEScanIdx++;
         if ( simpleBLEScanIdx >= simpleBLEScanRes )
@@ -316,24 +383,26 @@ static void simpleBLEObserver_HandleKeys( uint8 shift, uint8 keys )
           simpleBLEScanIdx = 0;
         }
         
-        LCD_WRITE_STRING_VALUE( "Device", simpleBLEScanIdx + 1,
-                                10, HAL_LCD_LINE_1 );
-        LCD_WRITE_STRING( bdAddr2Str( simpleBLEDevList[simpleBLEScanIdx].addr ),
-                          HAL_LCD_LINE_2 );
+        LOG( "Device: %d", simpleBLEScanIdx + 1 );
+        LOG( bdAddr2Str( simpleBLEDevList[simpleBLEScanIdx].addr ) );
+        // LCD_WRITE_STRING_VALUE( "Device", simpleBLEScanIdx + 1,
+        //                         10, HAL_LCD_LINE_1 );
+        // LCD_WRITE_STRING( bdAddr2Str( simpleBLEDevList[simpleBLEScanIdx].addr ),
+        //                   HAL_LCD_LINE_2 );
     }
   }
 
-  if ( keys & HAL_KEY_RIGHT )
-  {
-  }
+  // if ( keys & HAL_KEY_RIGHT )
+  // {
+  // }
   
-  if ( keys & HAL_KEY_CENTER )
-  {
-  }
+  // if ( keys & HAL_KEY_CENTER )
+  // {
+  // }
   
-  if ( keys & HAL_KEY_DOWN )
-  {
-  }
+  // if ( keys & HAL_KEY_DOWN )
+  // {
+  // }
 }
 
 /*********************************************************************
@@ -347,12 +416,15 @@ static void simpleBLEObserver_HandleKeys( uint8 shift, uint8 keys )
  */
 static uint8 simpleBLEObserverEventCB( gapObserverRoleEvent_t *pEvent )
 {
+  printf("here\n");
   switch ( pEvent->gap.opcode )
   {
     case GAP_DEVICE_INIT_DONE_EVENT:  
       {
-        LCD_WRITE_STRING( "BLE Observer", HAL_LCD_LINE_1 );
-        LCD_WRITE_STRING( bdAddr2Str( pEvent->initDone.devAddr ),  HAL_LCD_LINE_2 );
+        LOG( "BLE Observer" );
+        LOG( bdAddr2Str( pEvent->initDone.devAddr ) );
+        // LCD_WRITE_STRING( "BLE Observer", HAL_LCD_LINE_1 );
+        // LCD_WRITE_STRING( bdAddr2Str( pEvent->initDone.devAddr ),  HAL_LCD_LINE_2 );
       }
       break;
 
@@ -372,11 +444,12 @@ static uint8 simpleBLEObserverEventCB( gapObserverRoleEvent_t *pEvent )
         osal_memcpy( simpleBLEDevList, pEvent->discCmpl.pDevList,
                      (sizeof( gapDevRec_t ) * pEvent->discCmpl.numDevs) );
         
-        LCD_WRITE_STRING_VALUE( "Devices Found", simpleBLEScanRes,
-                                10, HAL_LCD_LINE_1 );
+        LOG( "Devices Found: %d", simpleBLEScanRes );
+        // LCD_WRITE_STRING_VALUE( "Devices Found", simpleBLEScanRes,
+        //                         10, HAL_LCD_LINE_1 );
         if ( simpleBLEScanRes > 0 )
         {
-          LCD_WRITE_STRING( "<- To Select", HAL_LCD_LINE_2 );
+          // LCD_WRITE_STRING( "<- To Select", HAL_LCD_LINE_2 );
         }
 
         // initialize scan index to last device
@@ -454,31 +527,55 @@ char *bdAddr2Str( uint8 *pAddr )
   return str;
 }
 
-// #if (defined HAL_I2C) && (HAL_I2C == TRUE)
-// uint8 I2C_Callback_Func(uint8 cnt)
-// {
-//   printf("I2C cnt value is %x\n", cnt);
+#if (defined HAL_I2C) && (HAL_I2C == TRUE)
+uint8 buffer[HAL_I2C_BUF_MAX] = {0};
+uint8 I2C_Callback_Func(uint8 cnt, uint8 src)
+{
+  static uint8 indx = 0;
+  // LOG("I2C cnt value is %x\n", cnt);
 
-//   uint8 buffer[HAL_I2C_BUF_MAX] = {0};
+  HalI2CRead(cnt, buffer);
+  // LOG("I2C buffer: ");
+  // for(int i = 0; i<cnt; i++)
+  // {
+  //   LOG("buffer[%d]: %x, ", i, buffer[i]);
+  // }
+  // LOG("\n");
 
-//   HalI2CRead(cnt, buffer);
-//   for(int i = 0; i<cnt; i++)
-//   {
-//     printf("buffer[%d]: %x\n", i, buffer[i]);
-//   }
+  if(cnt!=0)
+  {
+    if(buffer[0] == WHO_AM_I)
+    {
+      osal_set_event( simpleBLETaskId, WHO_AM_I_EVT );
+    }
+    else if(buffer[0] == DEV_RESET)
+    {
+      osal_set_event( simpleBLETaskId, RESET_EVT );
+    }
+    else if(buffer[0] == BLE_SCAN)
+    {
+      osal_set_event( simpleBLETaskId, BLE_SCAN_START_EVT );
+    }
+    else if(buffer[0] == BLE_PRNT)
+    {
+      osal_set_event( simpleBLETaskId, BLE_SCAN_STOP_EVT );
+    }
+    return TRUE;
+  }
+  else{
+    // if(src == 0xA8)
+    // {
+    //   osal_set_event( simpleBLETaskId, I2C_DEBUG_PRINT_1 );
+    // }
+    // else
+    // {
+    //   osal_set_event( simpleBLETaskId, I2C_DEBUG_PRINT_2 );
+    // }
+    return TRUE;
+  }
 
-//   if(buffer[0] == 0x75)
-//   {
-//     buffer[1] = 0x12;
-//     buffer[2] = 0x34;
-//     buffer[3] = 0x56;
-//     buffer[4] = 0x78;
-//     HalI2CWrite(4, &buffer[1]);
-//   }
-
-//   return 1;
-// }
-// #endif
+}
+#endif // (defined HAL_I2C) && (HAL_I2C == TRUE)
 
 /*********************************************************************
 *********************************************************************/

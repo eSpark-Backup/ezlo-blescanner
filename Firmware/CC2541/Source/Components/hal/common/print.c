@@ -33,5 +33,17 @@ __near_func int  putchar(int c)
 MEMORY_ATTRIBUTE int  putchar(int c)
 #endif
 {
-    return HalUARTWrite( NPI_UART_PORT, (uint8*)&c, 1 );
+    return NPI_WriteTransport( (uint8*)&c, 1 );
+}
+
+#if (__CODE_MODEL__ == __CM_BANKED__)
+__near_func int  getchar(void)
+#else
+MEMORY_ATTRIBUTE int  getchar(void)
+#endif
+{
+    uint8 c = 0;
+    NPI_ReadTransport( (uint8*)&c, 1 );
+
+    return c;
 }

@@ -87,18 +87,18 @@ const pTaskEventHandlerFn tasksArr[] =
 {
   LL_ProcessEvent,
   Hal_ProcessEvent,
-  HCI_ProcessEvent,
+  // HCI_ProcessEvent,
 #if defined ( OSAL_CBTIMER_NUM_TASKS )
   OSAL_CBTIMER_PROCESS_EVENT( osal_CbTimerProcessEvent ),
 #endif
   //L2CAP_ProcessEvent,
-  GAP_ProcessEvent,
+  // GAP_ProcessEvent,
   //GATT_ProcessEvent,
   //SM_ProcessEvent,
-  GAPObserverRole_ProcessEvent,
+  // GAPObserverRole_ProcessEvent,
   //GAPBondMgr_ProcessEvent,
   //GATTServApp_ProcessEvent,
-  SimpleBLEObserver_ProcessEvent
+  SimpleBLEObserver_ProcessEvent,
 };
 
 const uint8 tasksCnt = sizeof( tasksArr ) / sizeof( tasksArr[0] );
@@ -131,7 +131,7 @@ void osalInitTasks( void )
   Hal_Init( taskID++ );
 
   /* HCI Task */
-  HCI_Init( taskID++ );
+  // HCI_Init( taskID++ );
 
 #if defined ( OSAL_CBTIMER_NUM_TASKS )
   /* Callback Timer Tasks */
@@ -143,7 +143,7 @@ void osalInitTasks( void )
   //L2CAP_Init( taskID++ );
 
   /* GAP Task */
-  GAP_Init( taskID++ );
+  // GAP_Init( taskID++ );
 
   /* GATT Task */
   //GATT_Init( taskID++ );
@@ -152,7 +152,7 @@ void osalInitTasks( void )
   //SM_Init( taskID++ );
 
   /* Profiles */
-  GAPObserverRole_Init( taskID++ );
+  // GAPObserverRole_Init( taskID++ );
   //GAPBondMgr_Init( taskID++ );
 
   //GATTServApp_Init( taskID++ );

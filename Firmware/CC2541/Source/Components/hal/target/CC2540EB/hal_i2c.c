@@ -247,7 +247,7 @@ static uint8 i2cMstStrt(uint8 address, uint8 RD_WRn)
  */
 void HalI2CInit(i2cClock_t clockRate)
 {
-  printf("HalI2CInit with clock rate %d", clockRate);
+  printf("HalI2CInit with clock rate %d\n", clockRate);
   I2C_WRAPPER_DISABLE();
   I2CADDR = 0; // no multi master support at this time
   I2C_CLOCK_RATE(clockRate);
@@ -471,17 +471,18 @@ static i2cLen_t i2cSlvTx(void)
  */
 void HalI2CInit(uint8 address, i2cCallback_t i2cCallback)
 {
-  printf("HalI2CInit, address: %x", address);
+  printf("HalI2CInit, address: 0x%X\n", address);
   i2cCB = i2cCallback;
   HAL_ASSERT(i2cCB);
 
   I2C_WRAPPER_DISABLE();
-  I2CADDR = address << 1;
+  I2CADDR = (address << 1) | BV(0);  // BV(0) sets bit 0 activating general-call address recognition.
   I2C_ENABLE();
   // Clear the CPU interrupt flag for Port_2 PxIFG has to be cleared before PxIF.
   I2C_PXIFG = 0;
   I2C_IF = 0;
   I2C_INT_ENABLE();
+  HAL_ENABLE_INTERRUPTS();
 }
 
 /**************************************************************************************************
@@ -514,6 +515,7 @@ i2cLen_t HalI2CRead(i2cLen_t len, uint8 *pBuf)
     rxLen -= len;
   }
 
+  // (void)memcpy(pBuf, i2cRxBuf+i2cRxIdx, len);
   (void)osal_memcpy(pBuf, i2cRxBuf+i2cRxIdx, len);
   i2cRxIdx += len;
   i2cRxLen = rxLen;
@@ -599,54 +601,107 @@ HAL_ISR_FUNCTION(halI2CIsr, I2C_VECTOR)
 {
   HAL_ENTER_ISR();
 
-  switch (I2CSTAT)
+  uint8 stat_i2c = I2CSTAT;
+
+  switch (stat_i2c)
   {
-  case slvAddrAckR:
-    if (i2cRxLen == 0)
-    {
-      i2cSlvRx();  // Block, receiving bytes from the Master.
-    }
-    else  // Rx overrun.
-    {
-      volatile uint8 ch;
-      // Throw away these new bytes & leave old msg so no race with background HalI2CRead().
-      I2C_SET_NACK();
-      SLV_READ(ch);
-      I2C_CLR_NACK();
-    }
+    case slvAddrAckR:
+      // printf("slvAddrAckR\n");
+      if (i2cRxLen == 0)
+      {
+        i2cSlvRx();  // Block, receiving bytes from the Master.
+      }
+      else  // Rx overrun.
+      {
+        volatile uint8 ch;
+        // Throw away these new bytes & leave old msg so no race with background HalI2CRead().
+        I2C_SET_NACK();
+        SLV_READ(ch);
+        I2C_CLR_NACK();
+      }
 
-    (void)i2cCB(i2cRxLen);  // Alert Application that a Master Tx is ready to read.
-    break;
+      (void)i2cCB(i2cRxLen, slvAddrAckR);  // Alert Application that a Master Tx is ready to read.
+      break;
 
-  case slvAddrAckW:
-    if (i2cTxLen != 0)
-    {
-      i2cSlvTx();  // Block, transmitting bytes to the Master.
-    }
-    else if (i2cCB(0) == FALSE)
-    {
-      I2C_SET_NACK();
-      SLV_WRITE(0);
-      I2C_CLR_NACK();
-    }
-    else
-    {
-      /* Slave will be clock-stretching, blocking master, until Application makes a HalI2CWrite().
-       * While addressed as a slave, the I2C ISR keeps firing even though the I2CSTAT is not
-       * changing and the flags are cleared below. So this special ISR disable here to be
-       * re-enabled within the slave HalI2CWrite() function.
-       */
-      I2C_INT_DISABLE();
-    }
-    break;
+    case slvAddrAckW:
+      // printf("slvAddrAckW\n");
+      if (i2cTxLen != 0)
+      {
+        i2cSlvTx();  // Block, transmitting bytes to the Master.
+      }
+      else if (i2cCB(0, slvAddrAckW) == FALSE)
+      {
+        I2C_SET_NACK();
+        SLV_WRITE(0);
+        I2C_CLR_NACK();
+      }
+      else
+      {
+        /* Slave will be clock-stretching, blocking master, until Application makes a HalI2CWrite().
+        * While addressed as a slave, the I2C ISR keeps firing even though the I2CSTAT is not
+        * changing and the flags are cleared below. So this special ISR disable here to be
+        * re-enabled within the slave HalI2CWrite() function.
+        */
+        I2C_INT_DISABLE();
+      }
+      break;
 
-  case i2cIdle:  // Not expected, but not really an error, so no need to execute a STOP.
-    break;
+    // case mstLostArbR:
+    //   printf("mstLostArbR\n");
+    //   break;
+      
+    // case slvAddrAckG:
+    //   printf("slvAddrAckG\n");
+    //   break;
+      
+    // case mstLostArbG:
+    //   printf("mstLostArbG\n");
+    //   break;
+      
+    // case slvDataAckR:
+    //   printf("slvDataAckR\n");
+    //   break;
+      
+    // case slvDataNackR:
+    //   printf("slvDataNackR\n");
+    //   break;
+      
+    // case genDataAckR:
+    //   printf("genDataAckR\n");
+    //   break;
+      
+    // case genDataNackR:
+    //   printf("genDataNackR\n");
+    //   break;
+      
+    // case slvStopped:
+    //   printf("slvStopped\n");
+    //   break;
+      
+    // case mstLostArbW:
+    //   printf("mstLostArbW\n");
+    //   break;
+      
+    // case slvDataAckW:
+    //   printf("slvDataAckW\n");
+    //   break;
+      
+    // case slvDataNackW:
+    //   printf("slvDataNackW\n");
+    //   break;
+      
+    // case slvLastAckW:
+    //   printf("slvLastAckW\n");
+    //   break;
+      
+    // case i2cIdle:  // Not expected, but not really an error, so no need to execute a STOP.
+    //   printf("i2cIdle\n");
+    //   break;
 
-  default:
-    I2C_STOP();
-    I2C_CLR_NACK();  // Setup to Ack the next time addressed.
-    break;
+    default:
+      I2C_STOP();
+      I2C_CLR_NACK();  // Setup to Ack the next time addressed.
+      break;
   }
 
   // Clear the CPU interrupt flag for Port_2 PxIFG has to be cleared before PxIF.

@@ -26,7 +26,7 @@
  its documentation for any purpose.
 
  YOU FURTHER ACKNOWLEDGE AND AGREE THAT THE SOFTWARE AND DOCUMENTATION ARE
- PROVIDED “AS IS” WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ PROVIDED ï¿½AS ISï¿½ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  INCLUDING WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY, TITLE,
  NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL
  TEXAS INSTRUMENTS OR ITS LICENSORS BE LIABLE OR OBLIGATED UNDER CONTRACT,
@@ -249,6 +249,38 @@ uint16 HalUARTWrite(uint8 port, uint8 *buf, uint16 len)
   #endif
   return 0;
 #endif
+}
+
+/******************************************************************************
+ * @fn      HalUARTBusy
+ *
+ * @brief   Checks if hardware is busy.
+ *
+ * @param   port - UART port
+ *
+ * @return  TRUE if the UART H/W is busy or buffers are not empty; FALSE otherwise.
+ *****************************************************************************/
+uint8 HalUARTBusy(uint8 port)
+{
+#if (HAL_UART_DMA == 1)
+  if (port == HAL_UART_PORT_0)  return HalUARTBusyDMA();
+#endif
+#if (HAL_UART_DMA == 2)
+  if (port == HAL_UART_PORT_1)  return HalUARTBusyDMA();
+#endif
+#if (HAL_UART_ISR == 1)
+  if (port == HAL_UART_PORT_0)  return HalUARTBusyISR();
+#endif
+#if (HAL_UART_ISR == 2)
+  if (port == HAL_UART_PORT_1)  return HalUARTBusyISR();
+#endif
+#if (HAL_UART_SPI == 1)
+  // if (port == HAL_UART_PORT_0)  return HalUARTWriteSPI(buf, len);
+#endif
+#if (HAL_UART_SPI == 2)
+  // if (port == HAL_UART_PORT_1)  return HalUARTWriteSPI(buf, len);
+#endif
+  return 0;
 }
 
 /******************************************************************************

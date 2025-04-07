@@ -17,6 +17,8 @@
         "hal_timer.h": "c",
         "hal_key.h": "c",
         "hal_led.h": "c",
-        "cstdio": "c"
+        "cstdio": "c",
+        "hal_board.h": "c",
+        "ble_scanner.h": "c"
     }
 }
